@@ -2,26 +2,25 @@ def getBintrayUser() {
     if (System.getenv('BINTRAY_USER')) {
         logger.lifecycle(System.getenv('BINTRAY_USER'))
         return System.getenv('BINTRAY_USER')
-    }
-
-    if (rootProject.file('local.properties').exists()) {
+    } else if (rootProject.file('local.properties').exists()) {
         Properties properties = new Properties()
         properties.load(rootProject.file('local.properties').newDataInputStream())
         return properties.getProperty('bintray.user')
+    } else {
+        logger.lifecycle("Warning: Could not find BINTRAY_KEY in environment or local.properties")
     }
 }
 
 def getBintrayKey() {
     if (System.getenv('BINTRAY_KEY')) {
-        logger.lifecycle(System.getenv('BINTRAY_USER'))
+        logger.lifecycle(System.getenv('BINTRAY_KEY'))
         return System.getenv('BINTRAY_KEY')
-//        return "fe040922a1fdd2ebbd0e6b1ceaf274d12604d948"
-    }
-
-    if (rootProject.file('local.properties').exists()) {
+    } else if (rootProject.file('local.properties').exists()) {
         Properties properties = new Properties()
         properties.load(rootProject.file('local.properties').newDataInputStream())
         return properties.getProperty('bintray.key')
+    } else {
+        logger.lifecycle("Warning: Could not find BINTRAY_KEY in environment or local.properties")
     }
 }
 
@@ -75,7 +74,7 @@ task deploySnapshot {
 
     doLast {
         version = version
-        bintrayUpload.setVersionName('2.0.0')
+        bintrayUpload.setVersionName(bintrayUpload.getVersionName())
         bintrayUpload.setUserOrg('emersontest')
         bintrayUpload.setRepoName('memer')
         bintrayUpload.setOverride(true)
@@ -93,7 +92,8 @@ task deployRelease {
     finalizedBy bintrayUpload
 
     doLast {
-        bintrayUpload.setVersionName('2.0.0')
+        logger.lifecycle(bintrayUpload.getVersionName())
+        bintrayUpload.setVersionName(bintrayUpload.getVersionName())
         bintrayUpload.setUserOrg('emersontest')
         bintrayUpload.setRepoName('another-test')
         bintrayUpload.setOverride(true)
